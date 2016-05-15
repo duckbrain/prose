@@ -46,9 +46,13 @@ module.exports = Backbone.Model.extend({
     var id = cookie.get('id');
     var token = cookie.get('oauth-token');
 
+    var github = auth.api + ((token && _.isUndefined(id)) || (id && this.get('id') === id) ?
+      '/user' : '/users/' + this.get('login'));
+
+    var gitlab = auth.api + '/user?access_token=' + token;
+
     // Return '/user' if authenticated but no user id cookie has been set yet
     // or if this model's id matches authenticated user id
-    return auth.api + ((token && _.isUndefined(id)) || (id && this.get('id') === id) ?
-      '/user' : '/users/' + this.get('login'));
+    return gitlab;
   }
 });
