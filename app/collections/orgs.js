@@ -4,7 +4,6 @@ var Org = require('../models/org');
 var config = require('../config');
 var auth = require('../config');
 var util = require('../util');
-var cookie = require('../cookie');
 
 module.exports = Backbone.Collection.extend({
   model: Org,
@@ -36,7 +35,7 @@ module.exports = Backbone.Collection.extend({
     // If not authenticated, show public repos for user in path.
     // https://developer.github.com/v3/orgs/#list-user-organizations
     if (!token || scope !== 'repo') {
-      return config.api + '/users/' + this.user.get('login') + '/orgs';
+      return auth.api + '/groups';
     }
 
     // Authenticated users see all repos they have access to.
