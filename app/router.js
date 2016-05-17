@@ -25,6 +25,19 @@ var util = require('./util');
 var auth = require('./config');
 var cookie = require('./cookie');
 
+// Convenience method to create a new, empty repo model.
+function newRepoModel (name, login) {
+  return new Repo({
+    name: name,
+    owner: {
+      // Mimic both github, gitlab property assignment.
+      // TODO good target for es6 variable-as-prop-name
+      login: login,
+      username: login
+    }
+  });
+}
+
 // Set scope
 auth.scope = cookie.get('scope') || 'repo';
 
@@ -188,8 +201,8 @@ module.exports = Backbone.Router.extend({
     this.app.loader.start(t('loading.repo'));
     this.app.nav.mode('repo');
 
-    var title = repoName;
-    if (branch) title = repoName + ': /' + path + ' at ' + branch;
+    var title = branch ? title = repoName + ': /' + path + ' at ' + branch
+      : repoName;
     util.documentTitle(title);
 
     var user = this.users.findWhere({ login: login });
@@ -200,13 +213,13 @@ module.exports = Backbone.Router.extend({
 
     var repo = findUserRepo(user, repoName);
     if (_.isUndefined(repo)) {
-      repo = newRepo(user, repoName);
+      repo = newRepoModel(repoName, login);
       user.repos.add(repo);
     }
 
     repo.fetch({
       success: (function(model, res, options) {
-        var content = new RepoView({
+        var repoView = new RepoView({
           app: this.app,
           branch: branch,
           model: repo,
@@ -216,8 +229,8 @@ module.exports = Backbone.Router.extend({
           sidebar: this.app.sidebar
         });
 
-        this.view = content;
-        this.app.$el.find('#main').html(this.view.render().el);
+        this.view = repoView;
+        this.app.$el.find('#main').html(repoView.render().el);
       }).bind(this),
       error: (function(model, xhr, options) {
         this.error(xhr);
@@ -269,7 +282,7 @@ module.exports = Backbone.Router.extend({
 
     var repo = findUserRepo(user, repoName);
     if (_.isUndefined(repo)) {
-      repo = newRepo(user, repoName);
+      repo = newRepoModel(repoName, login);
       user.repos.add(repo);
     }
 
@@ -320,7 +333,7 @@ module.exports = Backbone.Router.extend({
 
     var repo = findUserRepo(user, repoName);
     if (_.isUndefined(repo)) {
-      repo = newRepo(user, repoName);
+      repo = newRepoModel(repoName, login);
       user.repos.add(repo);
     }
 
