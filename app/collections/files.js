@@ -10,6 +10,8 @@ var cookie = require('../cookie');
 var util = require('../util');
 var ignore = require('ignore');
 
+var api = util.getApiFlavor();
+
 /*
  * placeholderValues {object} mapping of placeholders, ie {CURRENT_USER: 'sally'}
  * initialValue {string} default value possibly containing placeholder
@@ -80,8 +82,10 @@ module.exports = Backbone.Collection.extend({
     };
   },
 
-  parse: function(resp, options) {
-    return _.map(resp.tree, (function(file) {
+  parse: function(resp) {
+    var gitlab = api === 'gitlab';
+    var iterable = gitlab ? resp : resp.tree;
+    return _.map(iterable, (function(file) {
       return  _.extend(file, {
         branch: this.branch,
         collection: this,
@@ -317,6 +321,7 @@ module.exports = Backbone.Collection.extend({
   },
 
   url: function() {
+<<<<<<< HEAD
     return this.repo.url() + '/git/trees/' + this.sha + '?recursive=1';
   },
 
@@ -338,5 +343,8 @@ module.exports = Backbone.Collection.extend({
       "CURRENT_DATETIME": (new Date()).format('Y-m-d H:i O'),
       "CURRENT_USER": user
     };
+=======
+    return this.repo.filesUrl(this.sha);
+>>>>>>> Files, commits differentiate github, gitlab
   }
 });
