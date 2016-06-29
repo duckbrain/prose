@@ -6,10 +6,26 @@ var jsyaml = require('js-yaml');
 var util = require('.././util');
 
 module.exports = Backbone.Model.extend({
+  constructor: function(attributes, options) {
+    this.api = options && options.api ? options.api : util.getApiFlavor()
+    var attr = this.api === 'gitlab' ? this.pickGitlab(attributes) : attributes;
+    Backbone.Model.call(this, attr);
+  },
+
+  parse: function (res) {
+    return this.api === 'gitlab' ? this.pickGitlab(res) : res;
+  },
+
+  pickGitlab: function (attr) {
+    return _.extend({
+      sha: attr.id
+    }, attr);
+  },
+
   idAttribute: 'path',
 
   initialize: function(attributes, options) {
-    options = _.clone(options) || {};
+    options = options || {};
     _.bindAll(this);
 
     this.isClone = function() {
@@ -353,8 +369,7 @@ module.exports = Backbone.Model.extend({
 
   url: function() {
     var branch = this.collection.branch || this.branch || this.get('branch');
-    var fullPath = this.collection.repo.url() + pathUtil.join('/contents', this.get('path') + '?ref=' + branch.get('name'));
-    return fullPath;
+    return this.collection.repo.fileUrl(branch, this.get('path'))
   },
 
   validate: function(attributes, options) {
