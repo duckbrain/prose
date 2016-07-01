@@ -1,4 +1,3 @@
-var $ = require('jquery-browserify');
 var _ = require('underscore');
 var url = require('url');
 
@@ -7,7 +6,6 @@ var Repos = require('../collections/repos');
 var Orgs = require('../collections/orgs');
 var auth = require('../config');
 var cookie = require('../cookie');
-var templates = require('../../dist/templates');
 var util = require('../util');
 
 module.exports = Backbone.Model.extend({
