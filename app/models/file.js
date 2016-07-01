@@ -300,13 +300,6 @@ module.exports = Backbone.Model.extend({
                   defaults: this.get('defaults')
                 });
 
-                // Backbone expects these to be top level,
-                // not in _attributes for some reason
-                // TODO: Don't actually do this, but hey, YOLO.
-                file.branch = branch;
-                file.collection = collection;
-                file.collection.branch = branch;
-
                 // Add to collection on save
                 file.save({
                   success: (function(model, res, options) {
