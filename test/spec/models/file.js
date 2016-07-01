@@ -1,10 +1,12 @@
-
 var File = require('../../../app/models/file');
+var Files = require('../../mocks/collections/files');
+var spies = require('../../mocks/helpers').spies;
+var fileMocker = require('../../mocks/models/file');
+var filedata = require('../../fixtures/get-file-response.json');
 
-var spies = require('../../mocks/helpers').spies,
-    fileMocker = require('../../mocks/models/file'),
-    filedata = require('../../fixtures/get-file-response.json');
-
+// set some convenience variables
+var fakePath = '/md.md';
+var collection = new Files();
 
 describe('file model', function() {
   var server, callbacks, fileContents;
@@ -30,7 +32,10 @@ describe('file model', function() {
     return file;
   }
 
+  it('fetches data from github api and content directly content URL', function() {
 
+    var content = 'content from server';
+    var file = mockFile(content, filedata);
 
   it('fetches data from github api and content directly content URL', function() {
 
@@ -120,5 +125,27 @@ describe('file model', function() {
     })
   })
 
+  describe('new and clones', function () {
+    it('tells you if it is new, a clone', function () {
+      var file = new File({
+        path: fakePath,
+        collection: collection
+      });
+      expect(file.isClone()).not.ok;
+      expect(file.isNew()).ok;
+      var clone = file.clone({ path: fakePath });
+      expect(clone.isClone()).ok;
+    });
+  });
+
+  describe('validation', function () {
+    it('validates against placeholder', function () {
+      var file = new File({
+        path: fakePath,
+        collection: collection
+      });
+      expect(file.validate({ path: '/' + file.getPlaceholder() })).ok;
+    });
+  });
 
 });
