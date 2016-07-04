@@ -292,7 +292,11 @@ module.exports = Backbone.Collection.extend({
     if (model) {
       // TODO: confirm overwrite with UI prompt
       model.set('content', content);
+<<<<<<< HEAD
       model.set('placeholder', t('actions.commits.update', { filename: file.name }));
+=======
+      model.set('placeholder', util.commitMessage(false, file.name));
+>>>>>>> Refactor code to generate default commit placeholder
     } else {
       // initialize new File model with content
       model = new File({
@@ -302,8 +306,12 @@ module.exports = Backbone.Collection.extend({
         path: path,
         repo: this.repo
       });
+<<<<<<< HEAD
 
       model.set('placeholder', t('actions.commits.create', { filename: file.name }));
+=======
+      model.set('placeholder', util.commitMessage(true, file.name));
+>>>>>>> Refactor code to generate default commit placeholder
     }
 
     // add to collection on save
