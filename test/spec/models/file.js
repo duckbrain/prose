@@ -9,14 +9,13 @@ var fakePath = '/md.md';
 var collection = new Files();
 
 describe('file model', function() {
-  var server, callbacks, fileContents;
+  var server, fileContents;
 
   before(function () { server = sinon.fakeServer.create(); });
   after(function () { server.restore(); });
   beforeEach(function() {
     // reset the DI state, so no File models are cached between tests.
     fileMocker.reset();
-    callbacks = spies(['success', 'error', 'complete']);
   })
 
   /*
@@ -25,10 +24,11 @@ describe('file model', function() {
   */
   var filecount = 0;
   function  mockFile(content, data) {
+    data = data || {};
+    data.content = content;
     var file = fileMocker();
+    var count = filecount += 1;
     server.respondWith('GET', file.url(), JSON.stringify(data));
-    file.set('content_url', 'https://api.gihub.com/repos/blah/blahblah/git/'+filecount++);
-    server.respondWith('GET', file.get('content_url'), content);
     return file;
   }
 
@@ -65,10 +65,8 @@ describe('file model', function() {
         yaml = '---\nlayout: post\npublished: true\n---\n',
         file = mockFile(yaml + content, filedata);
 
-    file.fetch(callbacks);
+    file.fetch();
     server.respond();
-
-    expect(callbacks.success).to.have.been.calledOnce;
 
     expect(file.get('metadata')).to.deep.equal({
       layout: 'post',
@@ -86,26 +84,23 @@ describe('file model', function() {
 
       it('appends a single newline if not already present', function() {
         var file = mockFile(fileContent, filedata);
-        file.fetch(callbacks);
+        file.fetch();
         server.respond();
-        expect(callbacks.success).to.have.been.calledOnce;
         expect(file.get('content')).to.equal(content + '\n');
       });
 
       it('trims all EOF whitespace *except* single newline', function() {
         var file = mockFile(fileContent + extraspace, filedata)
-        file.fetch(callbacks);
+        file.fetch();
         server.respond();
-        expect(callbacks.success).to.have.been.calledOnce;
         expect(file.get('content')).to.equal(content + '\n');
       })
 
       it('does not trim EOL whitespace', function() {
         var content = 'line with EOL space     \nanother line\n';
         var file = mockFile(content, filedata);
-        file.fetch(callbacks);
+        file.fetch();
         server.respond();
-        expect(callbacks.success).to.have.been.calledOnce;
         expect(file.get('content')).to.equal(content);
       })
     }
