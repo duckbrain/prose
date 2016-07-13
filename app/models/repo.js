@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 var Branches = require('../collections/branches');
 var Commits = require('../collections/commits');
-var config = require('../config');
+var auth = require('../config');
 var util = require('../util');
 var url = require('url');
 
@@ -150,11 +150,10 @@ module.exports = Backbone.Model.extend({
   url: function() {
     if (this.api === 'gitlab') {
       var id = this.id || this.get('owner').login + '%2F' + this.get('name');
-      return config.api + '/projects/' + id;
+      return auth.api + '/projects/' + id;
     } else {
       var url = config.api + '/repos/' + this.get('owner').login + '/' + this.get('name');
       return url;
-        '/' + this.get('name');
     }
   },
 
