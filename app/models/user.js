@@ -67,8 +67,9 @@ module.exports = Backbone.Model.extend({
     } else {
       // Return '/user' if authenticated but no user id cookie has been set yet
       // or if this model's id matches authenticated user id
-      return auth.api + ((token && _.isUndefined(id)) || (id && this.get('id') === id) ?
-        '/user' : '/users/' + this.get('login'));
+      var prefix = token && !id || id && this.get('id') === id ? '/user' :
+        '/users/' + this.get('login');
+      return auth.api + prefix;
     }
   }
 });
